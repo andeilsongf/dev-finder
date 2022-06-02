@@ -1,36 +1,93 @@
+import { useEffect, useState } from "react";
+import api from './services/api';
+
 export default function App() {
+
+  const [github_username, setGithub_username] = useState('');
+  const [techs, setTechs] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        setLatitude(latitude);
+        setLongitude(longitude)
+      },
+      (err) => { console.log(err); }, { timeout: 30000 })
+  }, []);
+
+  async function handleAddDev(e) {
+    e.preventDefault();
+
+    const response = await api.post('/devs', {
+      github_username,
+      techs,
+      latitude,
+      longitude
+    });
+
+    console.log(response.data);
+  }
 
   return (
     <div className="lg:flex-row flex-col max-w-7xl m-[0_auto] lg:px-16 px-4 py-8 flex lg:items-start sm:mb[20px]">
       <aside className="lg:w-80 w-full bg-white shadow-3xl py-8 px-6 mb-[20px]">
 
         <strong className="text-xl text-center block text-[#333]">Cadastrar</strong>
-        <form className="mt-8">
+        <form onSubmit={handleAddDev} className="mt-8">
           <div className="">
             <label htmlFor="github_username">Usuário do Github</label>
-            <input name="github_username" id="github_username" required />
+            <input
+              name="github_username"
+              id="github_username"
+              value={github_username}
+              onChange={e => setGithub_username(e.target.value)}
+              required />
           </div>
 
           <div className="mt-5">
             <label htmlFor="techs">Tecnologias</label>
-            <input name="techs" id="techs" required />
+            <input
+            name="techs"
+            id="techs"
+            value={techs}
+            onChange={e => setTechs(e.target.value)}
+            required />
           </div>
 
           <div className="flex flex-row gap-5 mt-5">
 
             <div>
               <label htmlFor="latitude">Latitude</label>
-              <input name="latitude" id="latitude" required />
+              <input
+                type="number"
+                name="latitude"
+                id="latitude"
+                value={latitude}
+                onChange={e => setLatitude(e.target.value)}
+                required
+                />
             </div>
 
             <div>
               <label htmlFor="longitude">Longitude</label>
-              <input name="longitude" id="longitude" required />
+              <input
+              type="number"
+              name="longitude"
+              id="longitude"
+              value={longitude}
+              onChange={e => setLongitude(e.target.value)}
+              required />
             </div>
           </div>
+
+          <button type="submit" className="w-full border-0 mt-8 bg-[#7d40e7] rounded-sm py-4 px-5 text-base text-white cursor-pointer hover:bg-[#6931ca] transition ease-in-out delay-050 font-bold">Salvar</button>
+          
         </form>
 
-        <button className="w-full border-0 mt-8 bg-[#7d40e7] rounded-sm py-4 px-5 text-base text-white cursor-pointer hover:bg-[#6931ca] transition ease-in-out delay-050 font-bold">Salvar</button>
       </aside>
 
       <main className="lg:flex-1 lg:ml-8">
@@ -109,4 +166,3 @@ export default function App() {
     </div>
   )
 }
-
