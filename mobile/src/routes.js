@@ -12,9 +12,27 @@ const Stack = createNativeStackNavigator();
 export function Routes() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
-        <Stack.Screen name="Main" component={Main} />
-        <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Navigator
+        initialRouteName="Main"
+        screenOptions={{
+          headerStyle: { backgroundColor: '#7D40E7'},
+          headerTintColor: '#FFF'
+          }}
+        >
+        <Stack.Screen
+          name="Main"
+          component={Main}
+          options={{
+            title: 'DevRadar',
+          }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            title: 'Perfil'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
