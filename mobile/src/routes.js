@@ -16,7 +16,8 @@ export function Routes() {
         initialRouteName="Main"
         screenOptions={{
           headerStyle: { backgroundColor: '#7D40E7'},
-          headerTintColor: '#FFF'
+          headerTintColor: '#FFF',
+          headerBackTitleVisible: false
           }}
         >
         <Stack.Screen
@@ -30,7 +31,7 @@ export function Routes() {
           name="Profile"
           component={Profile}
           options={{
-            title: 'Perfil'
+            title: 'Perfil no Github'
           }}
         />
       </Stack.Navigator>

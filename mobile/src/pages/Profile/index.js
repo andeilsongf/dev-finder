@@ -1,13 +1,11 @@
 import React from 'react';
+import { WebView } from 'react-native-webview';
 
-import {
-  Container
-} from './styles';
+export function Profile({ route, navigation }) {
+  
+  const { github_username } = route.params;
 
-export function Profile(){
   return (
-    <Container>
-
-    </Container>
+    <WebView source={{ uri: `https://github.com/${github_username}` }} />
   );
 }

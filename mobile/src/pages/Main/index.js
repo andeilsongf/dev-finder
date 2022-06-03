@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
+import { MaterialIcons } from '@expo/vector-icons'
+import { Callout } from 'react-native-maps';
 
-import { StyleSheet } from 'react-native'
-
+import api from '../../services/api';
 
 import {
   Container,
+  Map,
   UserLocationImage,
-  UserPopUp,
   Username,
   Biography,
   Techs,
+  FormWrapper,
+  FormInput,
+  ButtonForm
 } from './styles'
 
-export function Main(){
+export function Main({ navigation }){
 
+  const [devs, setDevs] = useState([]);
   const [currentRegion, setCurrentRegion] = useState(null);
+  const [techs, setTechs] = useState("");
 
   useEffect(() => {
     async function loadInitialPosition() {
@@ -42,34 +48,61 @@ export function Main(){
 
   },[]);
 
+  async function loadDevs() {
+    const { latitude, longitude } = currentRegion;
+
+    const response = await api.get('/search', {
+      params: {
+        latitude,
+        longitude,
+        techs
+      }
+    })
+
+    setDevs(response.data.devs);
+
+  }
+
+  function handleRegionChanged(region) {
+    setCurrentRegion(region);
+  }
+
   if (!currentRegion) {
     return null;
   }
 
   return (
+  <>
    <Container>
-     <MapView initialRegion={currentRegion} style={styles.map}>
-       <Marker
-        coordinate={{
-          latitude: -15.8078581,
-          longitude: -48.0693152,
-        }}
-        >
-
-          <UserLocationImage source={{ uri: 'https://avatars.githubusercontent.com/u/23082238?v=4' }} />
-          <UserPopUp>
-            <Username>Diego Fernandes</Username>
-            <Biography>CTO at @Rocketseat. Passionate about education and changing people's lives through programming.</Biography>
-            <Techs>ReactJS, React Native, Node.js</Techs>
-          </UserPopUp>
+     <Map onRegionChangeComplete={handleRegionChanged} initialRegion={currentRegion}>
+       {devs.map(dev => (
+         <Marker
+         key={dev._id}
+         coordinate={{
+            longitude: dev.location.coordinates[0],
+            latitude: dev.location.coordinates[1], 
+         }}
+         >
+ 
+           <UserLocationImage source={{ uri: dev.avatar_url }} />
+           <Callout style={{ width: 260 }} onPress={() => {
+             navigation.navigate('Profile', { github_username: dev.github_username});
+           }}>
+             <Username>{dev.name}</Username>
+             <Biography>{dev.bio}</Biography>
+             <Techs>{dev.techs.join(', ')}</Techs>
+           </Callout>
         </Marker>
-     </MapView>
+       ))}
+     </Map>
    </Container>
+
+   <FormWrapper>
+      <FormInput value={techs} onChangeText={setTechs}/>
+      <ButtonForm onPress={loadDevs}>
+        <MaterialIcons name="my-location" size={20} color="#fff" />
+      </ButtonForm>
+   </FormWrapper>
+   </>
   );
 }
-
-const styles = StyleSheet.create({
-  map: {
-    flex: 1
-  }
-})
